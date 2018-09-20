@@ -34,7 +34,7 @@ class PhoneData:
                     self.insertdb(use_table, desc, count)
                     count += 1
                 else:
-                    with open('error.txt', 'w', encoding='utf-8') as f:
+                    with open('error.txt', 'a', encoding='utf-8') as f:
                         f.write(phone_num + '\n')
 
     def insertdb(self, use_table, desc, count):
@@ -48,7 +48,8 @@ class PhoneData:
                 self.db.commit()
 
         except Exception as e:
-            print(e)
+            with open('sqlerrorlog.txt', 'a', encoding='utf8') as f:
+                f.write(str(e) + '\n')
             self.db.rollback()
 
 
@@ -75,7 +76,7 @@ def main():
         host="192.168.52.110",
         port=3306,
         user="superboy",
-        password="123456",
+        password="Wang123#",
         database="tg"
     )
 

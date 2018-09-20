@@ -6,6 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
+.idea
+
 # Distribution / packaging
 .Python
 build/
@@ -102,3 +104,9 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+*.xml
+.idea/workspace.xml
+.idea/workspace.xml
+tpvenv/Scripts/chardetect.exe
+test.py
+test.py

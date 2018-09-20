@@ -1,6 +1,11 @@
-import logging
-logger = logging.getLogger(__name__)
-with open('testerrot.txt', 'w') as f:
-    f.write(logger)
+from phone import Phone
 
- satr = 1 + "sdf"
+phone_num = '13300592449'
+p = Phone()
+ok = p.find(phone_num)
+with open('province_ch.txt', 'r', encoding="utf-8") as f:
+    province_list = f.read().splitlines()
+    print(province_list)
+index = province_list.index(ok.get('province'))
+print(index)
+print(ok)
