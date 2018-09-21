@@ -13,7 +13,7 @@ class PhoneData:
     def __def__(self):
         self.db.close()
 
-    def create_phone(self, prefix_list, province_list, province_cn_list):
+    def create_phone(self, prefix_list, province_list, province_ch_list):
         """ 判断手机号归属地，并插入到对应表中 """
 
         for prefix in prefix_list:
@@ -24,31 +24,39 @@ class PhoneData:
                 phone_num = str(int(prefix) * 100000000 + i)
                 i += 1
                 # 查找每个手机号的归属地信息
-                desc = self.p.find(phone_num)
-                # 返回归属的列表下标
-                index = province_cn_list.index(desc.get('province'))
-                if index:
-                    # 如果下标存在，找到对应数据库的表名
-                    use_table = province_list[index]
-                    # 调入函数，插入到数据库中
-                    self.insertdb(use_table, desc, count)
-                    count += 1
-                else:
-                    with open('error.txt', 'a', encoding='utf-8') as f:
+                try:
+                    desc = self.p.find(phone_num)
+                    # 返回归属的列表下标
+                    index = province_ch_list.index(desc.get('province'))
+                    # print(desc.get('province'), index)
+                    if index is not None:
+                        # 如果下标存在，找到对应数据库的表名
+                        use_table = province_list[index]
+                        # 调入函数，插入到数据库中
+                        self.insertdb(use_table, desc, count)
+                        count += 1
+                    else:
+                        with open('errorlog/descerror.txt', 'a', encoding='utf-8') as f:
+                            f.write(phone_num + '\n')
+                # 无用手机号
+                except Exception as e:
+                    with open('errorlog/NoneType.txt', 'a', encoding='utf-8') as f:
                         f.write(phone_num + '\n')
 
     def insertdb(self, use_table, desc, count):
         """向数据库中插入手机号码"""
-        sql = "INSERT INTO %s (phone, pro, city, mark, checked, company) value ('%s', '%s', '%s', 0, 0, '%s')" % \
+        value_list = []
+
+        sql = "INSERT INTO %s (phone, pro, city, mark, checked, company) values ('%s', '%s', '%s', 0, 0, '%s')" % \
               (use_table, desc.get('phone'), desc.get('province'), desc.get('city'), desc.get('phone_type'))
         try:
-            print(sql)
+            print('第%s个' % count + sql)
             self.cursor.execute(sql)
             if count % 1000 == 0:
                 self.db.commit()
-
+        # 写入数据库错误
         except Exception as e:
-            with open('sqlerrorlog.txt', 'a', encoding='utf8') as f:
+            with open('errorlog/sqlerrorlog.txt', 'a', encoding='utf8') as f:
                 f.write(str(e) + '\n')
             self.db.rollback()
 
@@ -62,7 +70,8 @@ def main():
     unicom = ['130', '131', '132', '145', '155', '156', '166', '171', '175', '176', '185', '186']
 
     # 电信号段
-    telecom = ['133', '149', '153', '173', '177', '180', '181', '189', '199']
+    # telecom = ['133', '149', '153', '173', '177', '180', '181', '189', '199']
+    telecom = ['133', '133', '153', '173', '177', '180', '181', '189', '199']
 
     # 数据库省列表
     with open('province.txt', 'r') as f:
@@ -73,6 +82,9 @@ def main():
         province_ch_list = f.read().splitlines()
 
     ph = PhoneData(
+
+
+
         host="192.168.52.110",
         port=3306,
         user="superboy",
